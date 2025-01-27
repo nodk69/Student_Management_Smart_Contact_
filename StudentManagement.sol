@@ -2,83 +2,85 @@
 
 pragma solidity  ^0.8.0;
 
-contract Structure {
-    
-    //Definning the structure Empolyee here 
-    struct Emp{
-        string name;
-        uint age;
-        address acc;
-    }
-    //it can use to initialize value for only one empolyee
-    Emp public emp;
+struct Student{
+    uint id;
+    string name;
+    uint grade;
+}
 
-    //pushing the value through the construter in emp
-    constructor(string memory _name,uint _age,address _acc){
-        emp.name=_name;
-        emp.age=_age;
-        emp.acc=_acc;
+contract StudentContact{
+
+    Student[] public students;
+
+    //adding new student
+    function addStudent(uint _id,string memory _name, uint _grade) public {
+        students.push(Student(_id,_name,_grade));
     }
 
-    //multiple empolyee can be stored here 
-    Emp[] public emps;
+    //updating a student information by Id
+    function updateStudentById(uint _id,string memory _name, uint _grade) public {
 
-    function setValues() public {
+        for(uint i=0;i<students.length;i++){
+            if(students[i].id==_id){
+                students[i].name=_name;
+                students[i].grade=_grade;
+            }
+        }
 
-        //these are the maily 3 types through which we put the data into Empolyee Array
-        //first way to initialize value  Order-Based Initialization
-        Emp memory emp1=Emp("Nadeem Kiwai",24,msg.sender); //order matters
-        
-        //first way to initialize value Named Parameter Initialization
-        Emp memory emp2=Emp({acc: msg.sender,name:"zeeshan",age:34}); //order does not matter
-        
-        //first way to initialize value Field-by-Field Assignment
-        Emp memory emp3;
-
-        emp3.name="shadan";
-        emp3.age=34;
-        emp3.acc=msg.sender;
-
-        //Copying from Another Struct
-        Emp memory emp4 = emp1; // Copy values from emp1
-
-       
-        //pushing all the data into the array
-        emps.push(emp1);
-        emps.push(emp2);
-        emps.push(emp3);
-        emps.push(emp4);
-
-        //pushing directly from here
-        emps.push(Emp("aru",43,msg.sender));
-
-        //updating the value of emp using storage keyword in the setter function
-        Emp storage emp_temp=emp;
-        emp_temp.name="abc";
-
-        //simply updating value through the variable
-        emp.name="xyz";
-
-        //now updating the array of empolyee
-        Emp storage emp_temp1=emps[1];
-
-        emp_temp1.age=4;
-        emp_temp1.name="we";
-
-        //now deleting one constrain 
-        delete emp_temp1.acc;
-        //deleting all the fields of an empolyee
-        delete emps[2];
-
-        
+        revert("Student not found");
     }
-    //initilizing the value through passed parammetres 
-    // function createEmp(string memory _name, uint _age, address _acc) public {
-    //     Emp memory emp5= Emp(_name, _age, _acc);
-    //     emps.push(emp5);
-    // }
 
-    //function updateValue()
+    //get a student details by Id
+    function getInformationById(uint _id) view public returns (Student memory){
+        for(uint i=0;i<students.length;i++){
+            if(students[i].id==_id){
+                return students[i];
+            }
+        }
 
+        revert("Student not found");
+    }
+
+    //Delete a student by Id
+    function deleteById(uint _id) public{
+       for(uint i=0;i<students.length;i++){
+            if(students[i].id==_id){
+                students[i]=students[students.length-1];
+                students.pop();
+                return;
+            }
+        }  
+
+        revert("Student not found");
+    }
+
+    //Get all students information at once
+    function getAllStudentInformation()public view returns(Student[] memory){
+        return students;
+    }
+
+    //updating only grades
+    function updateStudentGrade(uint _id, uint _newGrade) public {
+        for (uint i=0;i<students.length;i++) {
+            if (students[i].id==_id) {
+                students[i].grade = _newGrade;
+                return;
+            }
+        }
+
+        revert("Student not found");
+    }
+
+    //adding multiple of students at once
+    function bulkAddStudents(Student[] memory newStudents) public {
+        for (uint i=0;i<newStudents.length;i++) {
+            students.push(newStudents[i]);
+        }
+    }
+
+    //deleting all at once
+    function clearAllStudents() public {
+        delete students;
+    }
 
 }
